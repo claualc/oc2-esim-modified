@@ -1110,12 +1110,7 @@ void callback_kpm_subscription_request(E2AP_PDU_t *sub_req_pdu)
 
 	// start report loop in a dedicated thread
 	fprintf(stderr,"reqActionId id %li\n", reqActionId);
-	if ( reqActionId == 1 ) {
-		fprintf(stderr,"..:: RIC REPORT service :: set periodic timer");
-	}else if ( reqActionId == 2 ) {
-		fprintf(stderr,"..:: RIC INSERT service :: finish call process id (not set timer)");
-	}
-	if (triggerDef->buf && reqActionId == 1)
+	if (triggerDef->buf)
 	{
 		std::string trigger_str((char *)triggerDef->buf);
 		// fprintf(stderr,"triggerdef buf is %s\n", trigger_str.c_str());
@@ -1152,18 +1147,10 @@ void callback_kpm_subscription_request(E2AP_PDU_t *sub_req_pdu)
 			fprintf(stderr,"\n");
 			*/
 
-			// REPORT service is 2
-			// INSERT service is 1
-			if (reqActionId == 2) {
-				printf(" REPORT SERVICE: TIMER INITIATED TO EVERY 5 SECS");
-				int *report_timer = (int *)calloc(1, sizeof(int));
-				report_timer[0] = trigger_timer;
-				handleTimer(&e2sim, report_timer, ric_req_id, ric_instance_id, ran_function_id, action_id, triggerDef->buf, bfsize);
-			} else if (reqActionId == 1) {
-				printf(" INSERT SERVICE: NO TIMER INITIATED");
-			} else {
-				printf(" RIC SERVICE in action id not defined");
-			}
+			printf(" REPORT SERVICE: TIMER INITIATED TO EVERY 5 SECS");
+			int *report_timer = (int *)calloc(1, sizeof(int));
+			report_timer[0] = trigger_timer;
+			handleTimer(&e2sim, report_timer, ric_req_id, ric_instance_id, ran_function_id, action_id, triggerDef->buf, bfsize);
 		}
 		catch (const std::invalid_argument)
 		{

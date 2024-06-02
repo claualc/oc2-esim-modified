@@ -15,6 +15,8 @@
 
 void handleTimer(E2Sim* e2sim, int* timer, long* ric_req_id, long* ric_instance_id,
   long* ran_function_id, long* action_id, uint8_t* indreq_buff, int indreq_buflen);
+void nonPeriodicDataReport(E2Sim* e2sim, int* timer, long seqNum, long* ric_req_id, long* ric_instance_id,
+  long* ran_function_id, long* action_id);
 void periodicDataReport(E2Sim* e2sim, int* timer, long seqNum, long* ric_req_id, long* ric_instance_id,
   long* ran_function_id, long* action_id);
 void log_message(char* message, char* message_type, int len);
