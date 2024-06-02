@@ -1,3 +1,10 @@
+# Modifications
+
+- Able to read GNB_ID env variables: 1, 2 ,3 and 4 to set different meiads to the gnbs
+- Action Definition ids:
+    - action definiton id 1: REPORT service (Sets periodic timer)
+    - action definiton id 2: INSERT service 
+    
 # Build
 Run `build_e2sim.sh`, add `-i` to install all required dependencies and build JSON library from source.  
 
