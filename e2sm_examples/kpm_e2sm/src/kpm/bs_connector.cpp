@@ -97,7 +97,8 @@ void RICIndiListener(E2Sim *e2sim, long seqNum, long requestorId)
   //in_socket.bind(remote_endpoint_in, in_port);
   boost::system::error_code err;
 
-  char recvbuf[4096];
+  //char recvbuf[4096];
+  char recvbuf[9000]; // higher size messages
   size_t recvlen;
 
   E2AP_PDU *e2ap_pdu = NULL;

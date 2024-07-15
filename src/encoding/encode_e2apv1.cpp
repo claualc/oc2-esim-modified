@@ -166,7 +166,7 @@ void encoding::generate_e2apv1_setup_request_parameterized(E2AP_PDU_t *e2ap_pdu,
   // build gnb_id from env variable
   // only the first 4 characters (i.e., 8 hex bits) are considered
   char* gnb_id = std::getenv("GNB_ID");
-
+  fprintf(stderr, "Using passed value to build gNB ID: %s (hex: %x)\n", gnb_id, (uint8_t*) gnb_id);
 
   if (gnb_id == NULL) {
     fprintf(stderr, "Env variable GNB_ID not set. Using default values to build gNB ID\n");

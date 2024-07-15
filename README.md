@@ -4,6 +4,7 @@
 - Action Definition ids:
     - action definiton id 1: REPORT service (Sets periodic timer)
     - action definiton id 2: INSERT service 
+- Message sizes up to 9000/8 bytes. ( e2sm_examples/kpm_e2sm/src/kpm/bs_connector.cpp 101)
     
 # Build
 Run `build_e2sim.sh`, add `-i` to install all required dependencies and build JSON library from source.  
