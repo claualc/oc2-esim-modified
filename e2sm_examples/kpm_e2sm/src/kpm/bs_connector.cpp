@@ -56,7 +56,7 @@ void handleTimer(E2Sim *e2sim, int *timer, long *ric_req_id, long *ric_instance_
 
   fprintf(stderr, "ACTION TYPE %li", *action_id);
   if (*action_id == 1) {
-    fprintf(stderr, "RIC REPORT service");
+    fprintf(stderr, "RIC REPORT service every 3 seconds");
     std::thread(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
               ran_function_id, action_id)
       .detach();
@@ -64,20 +64,24 @@ void handleTimer(E2Sim *e2sim, int *timer, long *ric_req_id, long *ric_instance_
     fprintf(stderr, "RIC INSERT service");
     nonPeriodicDataReport(e2sim, timer, seq_num, ric_req_id, ric_instance_id,
               ran_function_id, action_id);
+  } else if (*action_id == 3) {
+    fprintf(stderr, "RIC REPORT service every 30 seconds");
+    timer[0] = timer[0] *10;
+    std::thread(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
+              ran_function_id, action_id)
+      .detach();
   }
-
-  
 
   fprintf(stderr, "periodicDataReport thread created successfully\n");
 }
 
 void startUnsolicitedRICIndiListener(E2Sim *e2sim, long requestorId){
-                if(!report_listener_running){
-                  long seq_num = 1;
-                  std::thread(RICIndiListener, e2sim, seq_num, requestorId).detach();
-                  report_listener_running = true;
-                }
-                 }
+    if(!report_listener_running){
+      long seq_num = 1;
+      std::thread(RICIndiListener, e2sim, seq_num, requestorId).detach();
+      report_listener_running = true;
+    }
+  }
 
 // function to periodically report data
 void RICIndiListener(E2Sim *e2sim, long seqNum, long requestorId)

@@ -2,8 +2,9 @@
 
 - Able to read GNB_ID env variables: 1, 2 ,3 and 4 to set different meiads to the gnbs
 - Action Definition ids:
-    - action definiton id 1: REPORT service (Sets periodic timer)
+    - action definiton id 1: REPORT service (Sets periodic timer of 3 seconds)
     - action definiton id 2: INSERT service 
+    - action definiton id 3: REPORT service (Sets periodic timer of 30 seconds)
 - Message sizes up to 9000/8 bytes. ( e2sm_examples/kpm_e2sm/src/kpm/bs_connector.cpp 101)
     
 # Build
