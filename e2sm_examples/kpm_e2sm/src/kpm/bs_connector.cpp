@@ -66,7 +66,6 @@ void handleTimer(E2Sim *e2sim, int *timer, long *ric_req_id, long *ric_instance_
               ran_function_id, action_id);
   } else if (*action_id == 3) {
     fprintf(stderr, "RIC REPORT service every 30 seconds");
-    timer[0] = timer[0] *10;
     std::thread(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
               ran_function_id, action_id)
       .detach();
@@ -192,7 +191,11 @@ void periodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_id,
       continue; // TODO: delete code after this line
 
       fprintf(stderr, "Waiting for response from gnb...");
-      std::chrono::milliseconds sleep_duration(500);
+      int custom_sleep = 500;
+      if (*action_id == 3) {
+        custom_sleep =custom_sleep*10;
+      }
+      std::chrono::milliseconds sleep_duration(custom_sleep);
       std::this_thread::sleep_for(sleep_duration);
       recvlen = in_socket.receive_from(boost::asio::buffer(recvbuf), remote_endpoint_in);
       fprintf(stderr, " recevied %lu bytes\n", recvlen);
