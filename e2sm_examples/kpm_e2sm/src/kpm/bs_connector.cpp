@@ -193,7 +193,7 @@ void periodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_id,
       fprintf(stderr, "Waiting for response from gnb...");
       int custom_sleep = 500;
       if (*action_id == 3) {
-        custom_sleep =custom_sleep*10;
+        custom_sleep =custom_sleep*5;
       }
       std::chrono::milliseconds sleep_duration(custom_sleep);
       std::this_thread::sleep_for(sleep_duration);
