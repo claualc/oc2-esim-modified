@@ -55,20 +55,15 @@ void handleTimer(E2Sim *e2sim, int *timer, long *ric_req_id, long *ric_instance_
   memcpy(indication_request_buffer, indreq_buff, indreq_buflen);
 
   fprintf(stderr, "ACTION TYPE %li", *action_id);
-  if (*action_id == 1) {
+  if (*action_id != 2) {
     fprintf(stderr, "RIC REPORT service every 3 seconds");
     std::thread(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
               ran_function_id, action_id)
       .detach();
-  } else if (*action_id == 2) {
+  } else {
     fprintf(stderr, "RIC INSERT service");
     nonPeriodicDataReport(e2sim, timer, seq_num, ric_req_id, ric_instance_id,
               ran_function_id, action_id);
-  } else if (*action_id == 3) {
-    fprintf(stderr, "RIC REPORT service every 30 seconds");
-    std::thread(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
-              ran_function_id, action_id)
-      .detach();
   }
 
   fprintf(stderr, "periodicDataReport thread created successfully\n");
@@ -85,8 +80,6 @@ void startUnsolicitedRICIndiListener(E2Sim *e2sim, long requestorId){
 // function to periodically report data
 void RICIndiListener(E2Sim *e2sim, long seqNum, long requestorId)
 { 
-
-
 
   int in_port = 6600;
   boost::asio::io_service io_service;
@@ -113,10 +106,10 @@ void RICIndiListener(E2Sim *e2sim, long seqNum, long requestorId)
     recvbuf[recvlen] = '\0';
 
     // fprintf(stderr,"printing buf recevied from gnb:\n");
-    for(int i=0; i<recvlen; i++){
-      fprintf(stderr, " %hhx ", recvbuf[i]);
-    }
-    fprintf(stderr, "\n");
+    // for(int i=0; i<recvlen; i++){
+    //   fprintf(stderr, " %hhx ", recvbuf[i]);
+    // }
+    // fprintf(stderr, "\n");
 
     fprintf(stderr,"Sending report to ric\n");
 
@@ -188,6 +181,7 @@ void periodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_id,
       startUnsolicitedRICIndiListener(e2sim,requestorId);
       std::chrono::seconds configured_sleep_duration(timer[0]);
       std::this_thread::sleep_for(configured_sleep_duration);
+      seqNum++;
       continue; // TODO: delete code after this line
 
       fprintf(stderr, "Waiting for response from gnb...");
