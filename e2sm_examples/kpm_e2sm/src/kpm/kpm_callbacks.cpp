@@ -1147,7 +1147,6 @@ void callback_kpm_subscription_request(E2AP_PDU_t *sub_req_pdu)
 			fprintf(stderr,"\n");
 			*/
 
-			printf(" REPORT SERVICE: TIMER INITIATED TO EVERY 5 SECS");
 			int *report_timer = (int *)calloc(1, sizeof(int));
 			report_timer[0] = trigger_timer;
 			handleTimer(&e2sim, report_timer, ric_req_id, ric_instance_id, ran_function_id, action_id, triggerDef->buf, bfsize);

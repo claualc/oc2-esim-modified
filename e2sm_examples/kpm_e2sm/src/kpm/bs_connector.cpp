@@ -54,14 +54,20 @@ void handleTimer(E2Sim *e2sim, int *timer, long *ric_req_id, long *ric_instance_
   indication_request_length = indreq_buflen;
   memcpy(indication_request_buffer, indreq_buff, indreq_buflen);
 
-  fprintf(stderr, "ACTION TYPE %li", *action_id);
-  if (*action_id != 2) {
-    fprintf(stderr, "RIC REPORT service every 3 seconds");
+  fprintf(stderr, "ACTION TYPE %li\n", *action_id);
+  if (*action_id == 1) {
+    fprintf(stderr, "RIC REPORT service every %i seconds\n", timer[0]);
+    std::thread(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
+              ran_function_id, action_id)
+      .detach();
+  } if (*action_id != 3) {
+    timer[0]= 5;
+    fprintf(stderr, "RIC REPORT service every %i seconds \n",timer[0]);
     std::thread(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
               ran_function_id, action_id)
       .detach();
   } else {
-    fprintf(stderr, "RIC INSERT service");
+    fprintf(stderr, "RIC INSERT service \n");
     nonPeriodicDataReport(e2sim, timer, seq_num, ric_req_id, ric_instance_id,
               ran_function_id, action_id);
   }
@@ -162,8 +168,11 @@ void periodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_id,
 
   while (report_data_nrt_ric)
   {
+    if (actionId==3) {
+     timer[0]=5; 
+    }
 
-    fprintf(stderr, "timer expired for requestorId %ld, instanceId %ld, ranFunctionId %ld, actionId %ld: %d s\n",
+    fprintf(stderr, "periodicDataReport: timer expired for requestorId %ld, instanceId %ld, ranFunctionId %ld, actionId %ld: %d s\n",
             requestorId, instanceId, ranFunctionId, actionId, timer[0]);
 
     if (DEBUG)
@@ -180,9 +189,6 @@ void periodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_id,
       out_socket.send_to(boost::asio::buffer(indication_request_buffer, indication_request_length), remote_endpoint_out, 0, err);
       startUnsolicitedRICIndiListener(e2sim,requestorId);
       std::chrono::seconds configured_sleep_duration(timer[0]);
-      if (*action_id==3) {
-        std::chrono::seconds configured_sleep_duration(6);
-      }
       std::this_thread::sleep_for(configured_sleep_duration);
       seqNum++;
       continue; // TODO: delete code after this line
@@ -292,7 +298,7 @@ void nonPeriodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_
   E2AP_PDU *e2ap_pdu = NULL;
 
 
-    fprintf(stderr, "timer expired for requestorId %ld, instanceId %ld, ranFunctionId %ld, actionId %ld: %d s\n",
+    fprintf(stderr, "nonPeriodicDataReport: timer expired for requestorId %ld, instanceId %ld, ranFunctionId %ld, actionId %ld: %d s\n",
             requestorId, instanceId, ranFunctionId, actionId, timer[0]);
 
     if (DEBUG)
