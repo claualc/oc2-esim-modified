@@ -180,6 +180,9 @@ void periodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_id,
       out_socket.send_to(boost::asio::buffer(indication_request_buffer, indication_request_length), remote_endpoint_out, 0, err);
       startUnsolicitedRICIndiListener(e2sim,requestorId);
       std::chrono::seconds configured_sleep_duration(timer[0]);
+      if (*action_id==3) {
+        std::chrono::seconds configured_sleep_duration(6);
+      }
       std::this_thread::sleep_for(configured_sleep_duration);
       seqNum++;
       continue; // TODO: delete code after this line
