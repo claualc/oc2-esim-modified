@@ -18,7 +18,9 @@ extern "C"
 }
 
 int report_data_nrt_ric = 1;
-uint8_t *indication_request_buffer;
+uint8_t *indication_request_buffer1;
+uint8_t *indication_request_buffer3;
+uint8_t *indication_request_buffer2;
 int indication_request_length;
 bool report_listener_running = false;
 
@@ -48,37 +50,52 @@ void handleTimer(E2Sim *e2sim, int *timer, long *ric_req_id, long *ric_instance_
   fprintf(stderr,"\n");
   */
 
-  // saving received buffer in global variable because then a thread will use it (safely, since it is read only)
-  // if we pass it directly to the thread, since the scope is local to this function, the behaviour will be undeifined
-  indication_request_buffer = (uint8_t *)calloc(sizeof(uint8_t), indreq_buflen);
-  indication_request_length = indreq_buflen;
-  memcpy(indication_request_buffer, indreq_buff, indreq_buflen);
 
   fprintf(stderr, "ACTION TYPE %li\n", *action_id);
   if (*action_id == 1) {
+
+
+    // saving received buffer in global variable because then a thread will use it (safely, since it is read only)
+    // if we pass it directly to the thread, since the scope is local to this function, the behaviour will be undeifined
+    indication_request_buffer1 = (uint8_t *)calloc(sizeof(uint8_t), indreq_buflen);
+    indication_request_length = indreq_buflen;
+    memcpy(indication_request_buffer1, indreq_buff, indreq_buflen);
+    
     fprintf(stderr, "RIC REPORT service every %i seconds\n", timer[0]);
-    std::thread(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
-              ran_function_id, action_id)
-      .detach();
-  } if (*action_id != 3) {
+    std::thread t1(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
+              ran_function_id, action_id);
+    t1.detach();
+  fprintf(stderr, "periodicDataReport thread created successfully\n");
+  } if (*action_id == 3) {
     timer[0]= 5;
+
+    // saving received buffer in global variable because then a thread will use it (safely, since it is read only)
+    // if we pass it directly to the thread, since the scope is local to this function, the behaviour will be undeifined
+    indication_request_buffer3 = (uint8_t *)calloc(sizeof(uint8_t), indreq_buflen);
+    indication_request_length = indreq_buflen;
+    memcpy(indication_request_buffer3, indreq_buff, indreq_buflen);
+
     fprintf(stderr, "RIC REPORT service every %i seconds \n",timer[0]);
-    std::thread(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
-              ran_function_id, action_id)
-      .detach();
+    std::thread t2(periodicDataReport, e2sim, timer, seq_num, ric_req_id, ric_instance_id,
+              ran_function_id, action_id);
+    t2.detach();
+  fprintf(stderr, "periodicDataReport thread created successfully\n");
   } else {
     fprintf(stderr, "RIC INSERT service \n");
+    indication_request_buffer2 = (uint8_t *)calloc(sizeof(uint8_t), indreq_buflen);
+    indication_request_length = indreq_buflen;
+    memcpy(indication_request_buffer2, indreq_buff, indreq_buflen);
     nonPeriodicDataReport(e2sim, timer, seq_num, ric_req_id, ric_instance_id,
               ran_function_id, action_id);
   }
 
-  fprintf(stderr, "periodicDataReport thread created successfully\n");
 }
 
 void startUnsolicitedRICIndiListener(E2Sim *e2sim, long requestorId){
     if(!report_listener_running){
       long seq_num = 1;
-      std::thread(RICIndiListener, e2sim, seq_num, requestorId).detach();
+      std::thread t3(RICIndiListener, e2sim, seq_num, requestorId);
+      t3.detach();
       report_listener_running = true;
     }
   }
@@ -86,6 +103,8 @@ void startUnsolicitedRICIndiListener(E2Sim *e2sim, long requestorId){
 // function to periodically report data
 void RICIndiListener(E2Sim *e2sim, long seqNum, long requestorId)
 { 
+
+  printf("RICIndiListener\n");
 
   int in_port = 6600;
   boost::asio::io_service io_service;
@@ -186,14 +205,21 @@ void periodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_id,
       fprintf(stderr,"\n");
       */
       // payload = (char*) "{\"timestamp\":1602706183796,\"slice_id\":0,\"dl_bytes\":53431,\"dl_thr_mbps\":2.39,\"ratio_granted_req_prb\":0.02,\"slice_prb\":6,\"dl_pkts\":200}";
-      out_socket.send_to(boost::asio::buffer(indication_request_buffer, indication_request_length), remote_endpoint_out, 0, err);
+      if (actionId == 1) {
+        out_socket.send_to(boost::asio::buffer(indication_request_buffer1, indication_request_length), remote_endpoint_out, 0, err);
+      } else if (actionId == 2) {
+        printf("ERROR: ACTION 2 IS FALLING INTO PERIODIC FUNCT\n");
+      } else if (actionId == 3) {
+        out_socket.send_to(boost::asio::buffer(indication_request_buffer3, indication_request_length), remote_endpoint_out, 0, err);
+      }
+      
       startUnsolicitedRICIndiListener(e2sim,requestorId);
       std::chrono::seconds configured_sleep_duration(timer[0]);
       std::this_thread::sleep_for(configured_sleep_duration);
       seqNum++;
       continue; // TODO: delete code after this line
 
-      fprintf(stderr, "Waiting for response from gnb...");
+      fprintf(stderr, "Waiting for response from gnb...\n");
       int custom_sleep = 500;
       if (*action_id == 3) {
         custom_sleep =custom_sleep*5;
@@ -230,7 +256,6 @@ void periodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_id,
       e2sim->encode_and_send_sctp_data(e2ap_pdu);
       
       seqNum++;
-
     }
     else
     {
@@ -312,7 +337,7 @@ void nonPeriodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_
       fprintf(stderr,"\n");
       */
       // payload = (char*) "{\"timestamp\":1602706183796,\"slice_id\":0,\"dl_bytes\":53431,\"dl_thr_mbps\":2.39,\"ratio_granted_req_prb\":0.02,\"slice_prb\":6,\"dl_pkts\":200}";
-      out_socket.send_to(boost::asio::buffer(indication_request_buffer, indication_request_length), remote_endpoint_out, 0, err);
+      out_socket.send_to(boost::asio::buffer(indication_request_buffer2, indication_request_length), remote_endpoint_out, 0, err);
       startUnsolicitedRICIndiListener(e2sim,requestorId);
       std::chrono::seconds configured_sleep_duration(timer[0]);
       std::this_thread::sleep_for(configured_sleep_duration);
