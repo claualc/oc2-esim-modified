@@ -67,7 +67,7 @@ void handleTimer(E2Sim *e2sim, int *timer, long *ric_req_id, long *ric_instance_
     t1.detach();
   fprintf(stderr, "periodicDataReport thread created successfully\n");
   } if (*action_id == 3) {
-    timer[0]= 5;
+    timer[0]= timer[0]*8;
 
     // saving received buffer in global variable because then a thread will use it (safely, since it is read only)
     // if we pass it directly to the thread, since the scope is local to this function, the behaviour will be undeifined
@@ -187,9 +187,6 @@ void periodicDataReport(E2Sim *e2sim, int *timer, long seqNum, long *ric_req_id,
 
   while (report_data_nrt_ric)
   {
-    if (actionId==3) {
-     timer[0]=5; 
-    }
 
     fprintf(stderr, "periodicDataReport: timer expired for requestorId %ld, instanceId %ld, ranFunctionId %ld, actionId %ld: %d s\n",
             requestorId, instanceId, ranFunctionId, actionId, timer[0]);
