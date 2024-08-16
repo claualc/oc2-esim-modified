@@ -1136,7 +1136,7 @@ void callback_kpm_subscription_request(E2AP_PDU_t *sub_req_pdu)
 			// int trigger_timer = ((int) std::stoi(trigger_str) / 1000.0);
 
 			// set fix trigger timer for reports
-			int trigger_timer = 5;
+			int trigger_timer = 1;
 
 			fprintf(stderr, "setting trigger_timer to %d seconds for requestorId %ld\n", trigger_timer, requestorId);
 			/*
