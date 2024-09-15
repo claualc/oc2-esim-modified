@@ -170,37 +170,43 @@ void encoding::generate_e2apv1_setup_request_parameterized(E2AP_PDU_t *e2ap_pdu,
 
   if (gnb_id == NULL) {
     fprintf(stderr, "Env variable GNB_ID not set. Using default values to build gNB ID\n");
-    gnb_bstring->buf[0] = 0xB5;
-    gnb_bstring->buf[1] = 0xC6;
-    gnb_bstring->buf[2] = 0x77;
-    gnb_bstring->buf[3] = 0x88;
+    gnb_bstring->buf[0] = 0x0;
+    gnb_bstring->buf[1] = 0x0;
+    gnb_bstring->buf[2] = 0x0;
+    gnb_bstring->buf[3] = 0x0;
   } else if (*gnb_id == '1') {
     fprintf(stderr, "GNB == 1\n");
-    gnb_bstring->buf[0] = 0xB1;
-    gnb_bstring->buf[1] = 0xC6;
-    gnb_bstring->buf[2] = 0x77;
-    gnb_bstring->buf[3] = 0x88;
+    gnb_bstring->buf[0] = 0x1;
+    gnb_bstring->buf[1] = 0x0;
+    gnb_bstring->buf[2] = 0x0;
+    gnb_bstring->buf[3] = 0x0;
   } else if (*gnb_id == '2') {
     fprintf(stderr, "GNB == 2\n");
-    gnb_bstring->buf[0] = 0xB0;
-    gnb_bstring->buf[1] = 0xC6;
-    gnb_bstring->buf[2] = 0x77;
-    gnb_bstring->buf[3] = 0x88;
+    gnb_bstring->buf[0] = 0x2;
+    gnb_bstring->buf[1] = 0x0;
+    gnb_bstring->buf[2] = 0x0;
+    gnb_bstring->buf[3] = 0x0;
 
   } else if (*gnb_id == '3') {
     fprintf(stderr, "GNB == 3\n");
-    gnb_bstring->buf[0] = 0xB0;
-    gnb_bstring->buf[1] = 0xC6;
-    gnb_bstring->buf[2] = 0x71;
-    gnb_bstring->buf[3] = 0x88;
+    gnb_bstring->buf[0] = 0x3;
+    gnb_bstring->buf[1] = 0x0;
+    gnb_bstring->buf[2] = 0x0;
+    gnb_bstring->buf[3] = 0x0;
   } else if (*gnb_id == '4') {
     fprintf(stderr, "GNB == 4\n");
-    gnb_bstring->buf[0] = 0xB0;
-    gnb_bstring->buf[1] = 0xC6;
-    gnb_bstring->buf[2] = 0x71;
-    gnb_bstring->buf[3] = 0x85;
+    gnb_bstring->buf[0] = 0x4;
+    gnb_bstring->buf[1] = 0x0;
+    gnb_bstring->buf[2] = 0x0;
+    gnb_bstring->buf[3] = 0x0;
+  } else if (*gnb_id == '4') {
+    fprintf(stderr, "GNB == 5\n");
+    gnb_bstring->buf[0] = 0x5;
+    gnb_bstring->buf[1] = 0x0;
+    gnb_bstring->buf[2] = 0x0;
+    gnb_bstring->buf[3] = 0x0;
   } else {
-    fprintf(stderr, "Using passed value to build gNB ID: %s (hex: %x)\n", gnb_id, (uint8_t*) gnb_id);
+    fprintf(stderr, "Using passed value to build gNB ID: %s (hex: %s)\n", gnb_id, (char*) gnb_bstring->buf);
     memcpy(gnb_bstring->buf, (uint8_t*) gnb_id, gnb_bstring->size);
   }
 
